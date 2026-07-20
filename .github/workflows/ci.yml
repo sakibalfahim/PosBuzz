@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: posbuzz
+          POSTGRES_PASSWORD: posbuzz
+          POSTGRES_DB: posbuzz
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U posbuzz -d posbuzz"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://posbuzz:posbuzz@localhost:5432/posbuzz?schema=public
+      DIRECT_URL: postgresql://posbuzz:posbuzz@localhost:5432/posbuzz?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-test-jwt-secret-min-32-characters!!
+      WEB_ORIGIN: http://localhost:5173
+      AUTH_ALLOW_REGISTER: "true"
+      PORT: "3000"
+      SEED_DEMO_PASSWORD: DemoPass123!
+      VITE_API_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Migrate
+        run: pnpm --filter @posbuzz/api exec prisma migrate deploy
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: E2E tests
+        run: pnpm test:e2e
+
+      - name: Build
+        run: pnpm build

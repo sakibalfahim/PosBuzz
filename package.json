@@ -1,0 +1,27 @@
+{
+  "name": "posbuzz",
+  "private": true,
+  "version": "1.0.0",
+  "description": "PosBuzz — production-quality POS monorepo",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @posbuzz/api --filter @posbuzz/web run dev",
+    "build": "pnpm --filter @posbuzz/api run build && pnpm --filter @posbuzz/web run build",
+    "lint": "pnpm -r --filter @posbuzz/api --filter @posbuzz/web run lint",
+    "test": "pnpm --filter @posbuzz/api run test",
+    "test:e2e": "dotenv -e .env -- pnpm --filter @posbuzz/api run test:e2e",
+    "db:migrate": "dotenv -e .env -- pnpm --filter @posbuzz/api run prisma:migrate",
+    "db:seed": "dotenv -e .env -- pnpm --filter @posbuzz/api run prisma:seed",
+    "db:generate": "pnpm --filter @posbuzz/api run prisma:generate",
+    "db:deploy": "dotenv -e .env -- pnpm --filter @posbuzz/api exec prisma migrate deploy",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\""
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}

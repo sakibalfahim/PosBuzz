@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: posbuzz
+      POSTGRES_PASSWORD: posbuzz
+      POSTGRES_DB: posbuzz
+    ports:
+      - "5432:5432"
+    volumes:
+      - posbuzz_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U posbuzz -d posbuzz"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    profiles: ["api"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://posbuzz:posbuzz@postgres:5432/posbuzz?schema=public
+      DIRECT_URL: postgresql://posbuzz:posbuzz@postgres:5432/posbuzz?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: local-docker-jwt-secret-min-32-characters
+      WEB_ORIGIN: http://localhost:5173
+      AUTH_ALLOW_REGISTER: "true"
+      PORT: "3000"
+      SEED_DEMO_PASSWORD: DemoPass123!
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  posbuzz_pg:

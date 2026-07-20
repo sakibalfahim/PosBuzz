@@ -1,7 +1,7 @@
 import { Form, Input, Button, Typography, Alert, Card } from 'antd';
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthProvider';
+import { useAuth } from '../auth/auth-context';
 import { ApiError } from '../api/client';
 
 export function LoginPage() {

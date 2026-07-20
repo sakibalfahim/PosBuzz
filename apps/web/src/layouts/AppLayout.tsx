@@ -6,7 +6,7 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthProvider';
+import { useAuth } from '../auth/auth-context';
 
 const { Header, Sider, Content } = Layout;
 

@@ -2,8 +2,8 @@
 
 Point-of-sale style inventory and sales API with a React admin UI. Create products, ring up sales, and refuse oversells under concurrency.
 
-**Live frontend:** _(set after Cloudflare Pages deploy)_  
-**Live API:** _(set after Render deploy)_ — health: `/health`
+**Live frontend:** https://posbuzz.pages.dev  
+**Live API:** https://posbuzz-x8fn.onrender.com — health: `/health`
 
 ## Features
 

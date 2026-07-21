@@ -22,7 +22,7 @@ describe('IdempotencyStore SET NX semantics', () => {
 
     expect(await store.claim('k1', 'pending:1', 60)).toBe(true);
     expect(await store.claim('k1', 'pending:2', 60)).toBe(false);
-    await store.set('k1', 'sale-real');
+    await store.set('k1', 'sale-real', 60);
     expect(await store.get('k1')).toBe('sale-real');
   });
 });
